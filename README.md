@@ -9,3 +9,6 @@ In order to use this, you need to do this steps:<br/>
 ==Database==<br/>
 Table:Journal<br/>
 Col: localDate (PrimaryKey),content <br/>
+
+==HTML==
+![image](https://github.com/user-attachments/assets/b1a08d32-d741-47db-bce5-176f150a9989)
