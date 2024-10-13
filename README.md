@@ -10,5 +10,7 @@ In order to use this, you need to do this steps:<br/>
 Table:Journal<br/>
 Col: localDate (PrimaryKey),content <br/>
 
-==HTML== <br/>
+==HTML pages== <br/>
 ![image](https://github.com/user-attachments/assets/b1a08d32-d741-47db-bce5-176f150a9989)
+<br/>
+![image](https://github.com/user-attachments/assets/56b8bd89-1625-4710-bd71-d511c7a43c88)
