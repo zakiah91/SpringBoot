@@ -7,5 +7,5 @@ In order to use this, you need to do this steps:<br/>
 2. run the html file to insert your content. <br/>
 
 ==Database==<br/>
-Table:Journal
-Col: localDate (PrimaryKey),content
+Table:Journal<br/>
+Col: localDate (PrimaryKey),content <br/>
