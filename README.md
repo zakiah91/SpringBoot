@@ -5,3 +5,7 @@ Meanwhile, the springboot will act as a server where it will save the content in
 In order to use this, you need to do this steps:<br/>
 1.run the springboot app <br/>
 2. run the html file to insert your content. <br/>
+
+==Database==<br/>
+Table:Journal
+Col: localDate (PrimaryKey),content
