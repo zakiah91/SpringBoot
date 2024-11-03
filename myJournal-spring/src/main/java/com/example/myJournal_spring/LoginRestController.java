@@ -1,7 +1,10 @@
 package com.example.myJournal_spring;
 
+import java.awt.SystemColor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginRestController {
 	
 	private LoginRepository loginRepository;
+	 
+	private Set<String> key = null;
+	
 	
 	@Autowired
 	public LoginRestController(LoginRepository loginRepository) {
@@ -35,52 +41,81 @@ public class LoginRestController {
 	}
 	
 	@PostMapping("/isValid")
-	public boolean isLoginValid(@RequestParam Map<String,String> password) {
+	public String isLoginValid(@RequestParam Map<String,String> tryLogin) {
 		
-		List<Login> login = loginRepository.findAll();
-		l("password = "+ password);
-
-		if(login == null) {
-			l("res = false");
-			return false;
+		key = tryLogin.keySet();
+		String[] keyValue =  {"usrName","pwd"};
+		String accessId;
+		
+		if(!isKeyValueExist(keyValue,key)) {
+			return "ERR";
 		}
-		else if(login.size() >= 1) {
-			if(password.get("password").equals(login.get(0).getPassword())) {
-				l("res = true");
-				return true;
-			}
-			else {
-				l("res = false");
+		
+		accessId = loginRepository.getAccessId(tryLogin.get(keyValue[0]), tryLogin.get(keyValue[1]));
+		
+		if(accessId == null || accessId.isBlank()) {
+			return "ERR";
+		}
+		
+		l("accessId = "+accessId );
+		return accessId;
+
+	}
+
+    private boolean isKeyValueExist(String[] keyValue, Set<String> key) {
+		for(int i=0; i<keyValue.length;i++) {
+			if(!key.contains(keyValue[i])) {
 				return false;
 			}
 		}
-		else {
-			l("res = false");
+		
+		return true;
+    }
+	
+	@PostMapping("/create")
+	public boolean createNewAcc(@RequestParam Map<String,String> accDetails) {
+		
+		key = accDetails.keySet();
+		String[] keyValue = {"pwd","usrName","accessId"};
+		
+		if(!isKeyValueExist(keyValue,key)) {
 			return false;
 		}
-
+		
+		Optional<Login> login = loginRepository.findById(accDetails.get(keyValue[1]));
+		
+		if (login.isEmpty()) {
+			
+			Login newLogin = new Login(accDetails.get(keyValue[0]), accDetails.get(keyValue[1]), Long.parseLong(accDetails.get(keyValue[2])) );
+			
+			loginRepository.save(newLogin);
+			
+			return true;
+		}
+		
+		return false;
 	}
-	
 	
 	@PostMapping("/update")
 	public boolean updateLogin(@RequestParam Map<String,String> password) {
 		
-		List<Login> loginList = loginRepository.findAll();
+		key = password.keySet();
+		String[] keyValue= {"password, accessId"};
+		String userName = "";
+		Long accessId = Long.parseLong(password.get(keyValue[1]));
 		
-		Set<String> key = password.keySet();
-		
-		for(String currKey : key){
-			l("key ==> "+ currKey);
+		if(!isKeyValueExist(keyValue,key)) {
+			return false;
 		}
 		
+		userName = loginRepository.getUsernameBasedOnAccessId(accessId);
+		if( userName == null || userName.isBlank()){
+			return false;
+		}
 		
 		l("password = "+ password.get("password"));
 		
-		if(loginList.size() >= 1) {
-			loginRepository.deleteAll();
-		}
-		
-		Login login = new Login(password.get("password"),0000);
+		Login login = new Login(password.get(keyValue[0]), userName, accessId );
 		loginRepository.save(login);
 		
 		return true;
