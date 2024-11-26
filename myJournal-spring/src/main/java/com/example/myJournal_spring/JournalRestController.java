@@ -2,8 +2,10 @@ package com.example.myJournal_spring;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,45 +24,103 @@ public class JournalRestController {
 	
 	private JournalRepository journalRepository;
 	
+	private LoginRepository loginRepository;
+	
+	private CommonFunctions cm = new CommonFunctions();
+	
 	@Autowired
-	public JournalRestController(JournalRepository journalRepository) {
+	public JournalRestController(JournalRepository journalRepository, LoginRepository loginRepository) {
 		this.journalRepository = journalRepository;
+		this.loginRepository   = loginRepository;
 	}
 	
 	@GetMapping
-	public List<Journal> getAllDataFromJournal(){
-		System.out.println("GET");
-		return journalRepository.findAll();
+	public HashMap<LocalDate,String> getAllDataFromJournal(@RequestParam Map<String,String> body){
+		
+		int KEY_ID=0;
+		String[] keyValue = {"accessId"};
+		
+		if(!cm.isKeyValueExist(keyValue, body.keySet())) return null;
+			
+		Long accessId = Long.parseLong(body.get(keyValue[KEY_ID]));
+		
+		Login login = loginRepository.findByAccessId(accessId);
+		
+		cm.l("GET");
+		
+		List<Journal> journalList = journalRepository.findByLogin(login);
+		
+		HashMap<LocalDate,String> dateContent = new HashMap<LocalDate,String>();
+		for(int i=0;i<journalList.size();i++) {
+			dateContent.put(journalList.get(i).getDate(), journalList.get(i).getContent());
+		}
+		
+		return dateContent;
 	}
 	
 	
-	//@PostMapping(consumes= {"application/json"},produces= {"application/json"})
 	@PostMapping("/post")
-	public Journal postNewJournal(@RequestParam Map<String,String> body) {
-		//Journal j = null;
-		Set<String> bodyKey = body.keySet();
+	public String postNewJournal(@RequestParam Map<String,String> body) {
 		
-		for(String key:bodyKey) {
-			System.out.println(key);
-		}
+		int KEY_DATE=0;
+		int KEY_CONTENT = 1;
+		int KEY_ID = 2;
+		String[] keyValue = {"date","content","accessId"};
 		
-		System.out.println("POST");
+		if(!cm.isKeyValueExist(keyValue, body.keySet())) return null;
 		
+		cm.l("POST");
+		
+		Long accessId = Long.parseLong(body.get(keyValue[KEY_ID]));
+		
+		Login login = loginRepository.findByAccessId(accessId);
+	
+		if(login == null) return "ERR";
+		
+		int YEAR = 0;
+		int MONTH = 1;
+		int DATE = 2;
 		String[] ymd = body.get("date").split("-");
 		
-		Journal journal = new Journal(LocalDate.of(Integer.parseInt(ymd[0]), Integer.parseInt(ymd[1]), Integer.parseInt(ymd[2])),body.get("content"));
-		//return "MESSAGE SENT";
-		return journalRepository.save(journal);
+		LocalDate localDate = LocalDate.of(Integer.parseInt(ymd[YEAR]), Integer.parseInt(ymd[MONTH]), Integer.parseInt(ymd[DATE]));
+		
+		Journal journal = journalRepository.findByLocalDate(localDate);
+		
+		
+		if(journal == null) {
+			journal = new Journal(localDate,
+								      body.get(keyValue[KEY_CONTENT]),
+				                     login);
+		}
+		else {
+			journal.setContent(body.get(keyValue[KEY_CONTENT]));
+		}
+		
+		journalRepository.save(journal);
+		
+		return "OK";
 	}
 	
 	@PostMapping("/delete")
-	public void deleteByDate(@RequestParam Map<String,String> localDate) {
+	public String deleteByDate(@RequestParam Map<String,String> data) {
 		
-		System.out.println("delete");
+		int KEY_JOURNAL = 0;
+		int KEY_LOGIN = 1;
+		String[] keyValue = {"journalId","accessId"};
 		
-		String[] ymd = localDate.get("date").split("-");
+		if(!cm.isKeyValueExist(keyValue, data.keySet())) return "ERR";
 		
-		journalRepository.deleteById(LocalDate.of(Integer.parseInt(ymd[0]), Integer.parseInt(ymd[1]), Integer.parseInt(ymd[2])));
+		Long journalId = Long.parseLong(data.get(keyValue[KEY_JOURNAL]));
+		Long accessId  = Long.parseLong(data.get(keyValue[KEY_LOGIN]));
+		
+		Login login = loginRepository.findByAccessId(accessId);
+		if(journalRepository.countByJournalIdAndLogin(journalId, login) == 0 ) return "ERR";
+		
+		cm.l("delete");
+				
+		journalRepository.deleteById(journalId);
+		
+		return "OK";
 	}
 
 }
