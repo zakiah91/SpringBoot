@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import jakarta.transaction.Transactional;
+
 @SpringBootApplication
 public class MyJournalSpringApplication extends SpringBootServletInitializer {
 
@@ -27,52 +29,37 @@ public class MyJournalSpringApplication extends SpringBootServletInitializer {
 
 	
 	
-	//auto fill in the data
+	//zakiah25/11:auto fill in the data
 	@Bean
-	public CommandLineRunner commandLineRunner(JournalRepository journalRepository) {
+	@Transactional
+	public CommandLineRunner commandLineRunner(JournalRepository journalRepository, LoginRepository loginRepository) {
 		
 		return (args)->{
-			 
 			
-			Journal journal1 = new Journal(LocalDate.of(2024, 9, 17),"content1");
-			Journal journal2 = new Journal(LocalDate.of(2024, 9, 16),"content2");
-			Journal journal3 = new Journal(LocalDate.of(2024, 9, 15),"content3");
-			 
-			journalRepository.save(journal1);
-			journalRepository.save(journal2);
-			journalRepository.save(journal3);
+			String username = "userA";
 			
-			List<Journal> journalList = journalRepository.findAll();
-			
-			for(int i=0; i<journalList.size();i++) {
-				print("content = " + journalList.get(i).getContent() + " , "+ journalList.get(i).getDate().toString());
-			}
-			
-			print("======================");
-
-			journalRepository.deleteById(LocalDate.of(2024, 9, 15));
-			
-			journalList.clear();
-			
-			journalList = journalRepository.findAll();
-			
-			for(int i=0; i<journalList.size();i++) {
-				print("content = " + journalList.get(i).getContent() + " , "+ journalList.get(i).getDate().toString());
-			}
-			
-			journalRepository.save(new Journal(LocalDate.of(2024, 9, 17),"content11112222"));
-			
-			print("======================");
-
-			journalList.clear();
-			
-			journalList = journalRepository.findAll();
-			
-			for(int i=0; i<journalList.size();i++) {
-				print("content = " + journalList.get(i).getContent() + " , "+ journalList.get(i).getDate().toString());
-			}
+			print(Integer.toString(loginRepository.countByUsername(username)));
 			
 			
+			
+			if(loginRepository.countByUsername(username) > 0)
+				return;
+			
+			//zakiah2511: the value of the password here is md5(12345)
+			Login login = new Login("827ccb0eea8a706c4c34a16891f84e7b",username);
+			loginRepository.save(login);
+			
+			Journal journal = new Journal();
+			
+			journal = new Journal(LocalDate.of(2024, 9, 17),"content1",login);
+			journalRepository.save(journal);
+			
+			journal = new Journal(LocalDate.of(2024, 9, 16),"content2",login);
+			journalRepository.save(journal);
+			
+			journal = new Journal(LocalDate.of(2024, 9, 15),"content3",login);
+			journalRepository.save(journal);
+						
 		};
 		
 	}
