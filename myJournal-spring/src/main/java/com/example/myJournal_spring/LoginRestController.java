@@ -24,6 +24,8 @@ public class LoginRestController {
 	 
 	private Set<String> key = null;
 	
+	private CommonFunctions cm = new CommonFunctions();
+	
 	
 	@Autowired
 	public LoginRestController(LoginRepository loginRepository) {
@@ -36,86 +38,90 @@ public class LoginRestController {
 		return "test";
 	}
 	
-	public void l(String log) {
-		System.out.println(log);
-	}
+
 	
 	@PostMapping("/isValid")
 	public String isLoginValid(@RequestParam Map<String,String> tryLogin) {
 		
 		key = tryLogin.keySet();
+		
+		int KEY_USER = 0;
+		int KEY_PWD = 1;
 		String[] keyValue =  {"usrName","pwd"};
-		String accessId;
+		long accessId=-1;
 		
-		if(!isKeyValueExist(keyValue,key)) {
+		if(!cm.isKeyValueExist(keyValue,key)) {
 			return "ERR";
 		}
 		
-		accessId = loginRepository.getAccessId(tryLogin.get(keyValue[0]), tryLogin.get(keyValue[1]));
+		Login login = loginRepository.findByUsernameAndPassword(tryLogin.get(keyValue[KEY_USER]), tryLogin.get(keyValue[KEY_PWD]));
+		accessId = login.getAccessId();
+	    cm.l("accessId = "+ Long.toString(accessId));
 		
-		if(accessId == null || accessId.isBlank()) {
+		
+		if(accessId == -1) {
 			return "ERR";
 		}
 		
-		l("accessId = "+accessId );
-		return accessId;
+		cm.l("accessId = "+accessId );
+		return Long.toString(accessId);
 
 	}
 
-    private boolean isKeyValueExist(String[] keyValue, Set<String> key) {
-		for(int i=0; i<keyValue.length;i++) {
-			if(!key.contains(keyValue[i])) {
-				return false;
-			}
-		}
-		
-		return true;
-    }
+
 	
 	@PostMapping("/create")
 	public boolean createNewAcc(@RequestParam Map<String,String> accDetails) {
 		
 		key = accDetails.keySet();
-		String[] keyValue = {"pwd","usrName","accessId"};
+		int KEY_PWD = 0;
+		int KEY_NAME = 1;
+		String[] keyValue = {"pwd","usrName"};
 		
-		if(!isKeyValueExist(keyValue,key)) {
+		if(!cm.isKeyValueExist(keyValue,key)) {
 			return false;
 		}
 		
-		Optional<Login> login = loginRepository.findById(accDetails.get(keyValue[1]));
 		
-		if (login.isEmpty()) {
-			
-			Login newLogin = new Login(accDetails.get(keyValue[0]), accDetails.get(keyValue[1]), Long.parseLong(accDetails.get(keyValue[2])) );
-			
-			loginRepository.save(newLogin);
-			
-			return true;
+		Login login = loginRepository.findByUsername(accDetails.get(keyValue[KEY_NAME]));
+		
+		if(login != null) {
+			return false;
 		}
 		
-		return false;
+		login = new Login(accDetails.get(keyValue[KEY_PWD]), accDetails.get(keyValue[KEY_NAME]));
+		
+		loginRepository.save(login);
+		
+		return true;
+		
 	}
 	
 	@PostMapping("/update")
-	public boolean updateLogin(@RequestParam Map<String,String> password) {
+	public boolean updatePassword(@RequestParam Map<String,String> password) {
 		
 		key = password.keySet();
-		String[] keyValue= {"password, accessId"};
-		String userName = "";
-		Long accessId = Long.parseLong(password.get(keyValue[1]));
 		
-		if(!isKeyValueExist(keyValue,key)) {
+		int KEY_PWD = 0;
+		int KEY_ID = 1;
+		String[] keyValue= {"password", "accessId"};
+		
+		if(!cm.isKeyValueExist(keyValue,key)) {
 			return false;
 		}
+		
+		String userName = "";
+		Long accessId = Long.parseLong(password.get(keyValue[KEY_ID]));
 		
 		userName = loginRepository.getUsernameBasedOnAccessId(accessId);
-		if( userName == null || userName.isBlank()){
+		if( userName == null ){
 			return false;
 		}
 		
-		l("password = "+ password.get("password"));
+		cm.l("password = "+ password.get("password"));
 		
-		Login login = new Login(password.get(keyValue[0]), userName, accessId );
+		Login login = loginRepository.findByUsername(userName);
+		login.setPassword(password.get(keyValue[KEY_PWD]));
 		loginRepository.save(login);
 		
 		return true;
