@@ -47,6 +47,14 @@ There are 2 controllers. They are: <br/>
   &emsp;&emsp;iv.GET /login - as a test to mark server is running. If OK, it will response "test"<br/>
 
 <b>B.journal-rest-controller </b><br/>
-&emsp;&emsp;i.POST /journal/post <br/>
-&emsp;&emsp;ii.POST /journal/delete <br/>
-&emsp;&emsp;iii.GET /journal <br/>
+&emsp;&emsp;i.POST /journal/post - create/update the journal table based on the given date, content and accessId. If OK, it will return OK. If NG, it will return ERR<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{"date":"2024-11-26","content":"My first try","accessId":"1"}</b><br/> 
+    &emsp;&emsp;&emsp;Example of NG case : <b>{"date":"2024-11-26","content":"My first try","accessId":"11"}</b><br/>
+    
+&emsp;&emsp;ii.POST /journal/delete - delete a row from the journal table based on the given journalId and accessId. If OK, it will return OK. If NG, it will return ERR<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{"journalId":"5","accessId":"1"}</b><br/> 
+    &emsp;&emsp;&emsp;Example of NG case : <b>{"journalId":"5","accessId":"11"}</b><br/>
+    
+&emsp;&emsp;iii.GET /journal - get date and content from Journal table based on the given accessId. If OK, it will return the date and content. If NG it will return NULL<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{ "accessId": "1"}</b><br/> 
+    &emsp;&emsp;&emsp;Example of NG case : <b>{ "accessId": "11"}</b><br/>
