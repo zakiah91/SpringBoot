@@ -19,3 +19,11 @@ Java JDK version : 23 <br />
 3) Modify the components in <i>myJournal-spring\src\main\resources</i> according to your own requirement <br/>
 4) Go to pom.xml and run it as "Maven install" . After that, a .war file will be generated under <i>myJournal-spring\target</i> <br/>
 5) Copy this .war file to your server or you can directly run it using this command <i>java -jar <YOUR_FILE_NAME>.war </i>
+
+## What happen after run
+1) After you run, it will automatically create tables under <i>myJournalDB</i>, as below : <br/>
+![image](https://github.com/user-attachments/assets/800773a4-ffb6-4229-9712-c74525700772)
+
+2) The table later, will be automatically filled with the following values :
+![image](https://github.com/user-attachments/assets/20888663-5771-4e73-b7c5-3c6b1097a49f)
+3) After that you can start test it
