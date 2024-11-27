@@ -24,6 +24,18 @@ Java JDK version : 23 <br />
 1) After you run, it will automatically create tables under <i>myJournalDB</i>, as below : <br/>
 ![image](https://github.com/user-attachments/assets/800773a4-ffb6-4229-9712-c74525700772)
 
-2) The table later, will be automatically filled with the following values :
+2) The table later, will be automatically filled with the following values : <br/>
 ![image](https://github.com/user-attachments/assets/20888663-5771-4e73-b7c5-3c6b1097a49f)
 3) After that you can start test it
+
+## REST APIs
+There are 2 controllers. They are: <br/>
+<b>A.login-rest-controller </b><br/>
+&emsp;&emsp;i.POST /login/update <br/>
+&emsp;&emsp;ii.POST /login/isValid <br/>
+&emsp;&emsp;iii.POST /login/create <br/>
+&emsp;&emsp;iv.GET /login <br/>
+<b>B.journal-rest-controller </b><br/>
+&emsp;&emsp;i.POST /journal/post <br/>
+&emsp;&emsp;ii.POST /journal/delete <br/>
+&emsp;&emsp;iii.GET /journal <br/>
