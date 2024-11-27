@@ -8,3 +8,7 @@ B) <i>Journal</i> - Contains the journal component. AccessId from Login is neede
 ## ER Diagram
 ![image](https://github.com/user-attachments/assets/6cfab974-5087-44cb-98c3-6b781ab9cb6e)
 
+## Developement Environment
+IDE - Eclipse <br/>
+Database - MySQL <br/>
+Java JDK version - 23 <br />
