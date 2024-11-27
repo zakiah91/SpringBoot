@@ -31,10 +31,21 @@ Java JDK version : 23 <br />
 ## REST APIs
 There are 2 controllers. They are: <br/>
 <b>A.login-rest-controller </b><br/>
-&emsp;&emsp;i.POST /login/update <br/>
-&emsp;&emsp;ii.POST /login/isValid <br/>
-&emsp;&emsp;iii.POST /login/create <br/>
-&emsp;&emsp;iv.GET /login <br/>
+
+  &emsp;&emsp;i.POST /login/update -update the password in db for the associated accessId. If OK, it will return TRUE. If NG, it will return FALSE<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{"password":"827ccb0eea8a706c4c34a16891f84e7b","accessId":"1" }</b><br/>
+    &emsp;&emsp;&emsp;Example of NG case : <b>{ "accessId":"1" }</b><br/>
+  
+  &emsp;&emsp;ii.POST /login/isValid - check whether the given username and password is correct. If OK, it will return the login accessId. If NG, it will return ERR<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{ "usrName": "userA","pwd": "827ccb0eea8a706c4c34a16891f84e7b" }</b><br/>
+    &emsp;&emsp;&emsp;Example of NG case : <b>{ "usrName": "userA","pwd": "827ccb0eea8a706c4c34a16891f84e7c" }</b><br/>
+  
+  &emsp;&emsp;iii.POST /login/create - create a new account. If OK, it will return TRUE. If NG, it will return FALSE.<br/>
+    &emsp;&emsp;&emsp;Example of OK case : <b>{"pwd" : "827ccb0eea8a706c4c34a16891f84e7b","usrName" : "userB"}</b><br/> 
+    &emsp;&emsp;&emsp;Example of NG case : <b>{"usrName" : "userB"}</b><br/>
+  
+  &emsp;&emsp;iv.GET /login - as a test to mark server is running. If OK, it will response "test"<br/>
+
 <b>B.journal-rest-controller </b><br/>
 &emsp;&emsp;i.POST /journal/post <br/>
 &emsp;&emsp;ii.POST /journal/delete <br/>
